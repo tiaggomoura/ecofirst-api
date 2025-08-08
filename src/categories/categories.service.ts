@@ -1,6 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { UpdateCategoryDto } from './dto/update-categoria.dto';
 
 @Injectable()
 export class CategoriesService {
@@ -22,6 +27,31 @@ export class CategoriesService {
 
     return this.prisma.category.create({
       data: dto,
+    });
+  }
+
+  async update(id: number, dto: UpdateCategoryDto): Promise<UpdateCategoryDto> {
+    const existing = await this.prisma.category.findUnique({ where: { id } });
+    if (!existing) throw new NotFoundException('Category not found.');
+
+    const duplicate = await this.prisma.category.findFirst({
+      where: {
+        name: dto.name,
+        type: dto.type,
+        NOT: { id },
+      },
+    });
+    if (duplicate)
+      throw new BadRequestException(
+        'Category with same name and type already exists.',
+      );
+
+    return this.prisma.category.update({
+      where: { id },
+      data: {
+        name: dto.name,
+        type: dto.type,
+      },
     });
   }
 

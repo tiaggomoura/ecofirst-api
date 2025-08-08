@@ -1,39 +1,30 @@
 import {
-  IsNotEmpty,
-  IsString,
-  IsNumber,
-  IsEnum,
   IsDateString,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
 } from 'class-validator';
 import { TransactionType } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 
-export class CreateTransactionDto {
-  @IsNotEmpty()
-  @IsNumber()
-  id: number;
-
+export class UpdateTransactionDto {
   @IsNotEmpty()
   @IsString()
   description: string;
 
-  @IsNotEmpty()
   @IsNumber()
   amount: Decimal;
 
-  @IsNotEmpty()
+  @IsDateString()
+  date: Date;
+
   @IsEnum(TransactionType)
   type: TransactionType;
 
-  @IsNotEmpty()
-  @IsDateString()
-  date: string;
-
-  @IsNotEmpty()
   @IsNumber()
   categoryId: number;
 
-  @IsNotEmpty()
   @IsNumber()
   paymentMethodId: number;
 }
