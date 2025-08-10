@@ -1,11 +1,18 @@
-import { TransactionType } from '@prisma/client';
-import { Type } from 'class-transformer';
-import { IsEnum, IsNumberString, IsOptional, IsString } from 'class-validator';
+// src/transactions/dto/find-transactions.dto.ts
+import { IsOptional, IsString, IsIn, IsInt, Min } from 'class-validator';
 
 export class FindTransactionsDto {
   @IsOptional()
-  @IsEnum(TransactionType)
-  type?: TransactionType;
+  seriesId?: string;
+
+  @IsOptional()
+  @IsString()
+  type?: 'RECEITA' | 'DESPESA';
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['PENDENTE', 'PAGO', 'RECEBIDO', 'CANCELADO'])
+  status?: 'PENDENTE' | 'PAGO' | 'RECEBIDO' | 'CANCELADO';
 
   @IsOptional()
   @IsString()
@@ -13,14 +20,22 @@ export class FindTransactionsDto {
 
   @IsOptional()
   @IsString()
-  from?: string;
+  from?: string; // ISO date
 
   @IsOptional()
   @IsString()
-  to?: string;
+  to?: string; // ISO date
 
   @IsOptional()
-  @Type(() => Number)
-  @IsNumberString()
+  @IsInt()
+  @Min(1)
   page?: number;
+
+  @IsOptional()
+  @IsInt()
+  installmentNumber?: number;
+
+  @IsOptional()
+  @IsInt()
+  installmentTotal?: number;
 }

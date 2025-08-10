@@ -18,6 +18,12 @@ import { FindTransactionsDto } from './dto/find-transactions.dto';
 export class TransactionsController {
   constructor(private service: TransactionsService) {}
 
+  /**
+   * Cria 1 ou N transações (parcelas), conforme dto.repeatCount.
+   * - status sempre inicia como 'PENDENTE'
+   * - amount deve chegar como string "23200.00" ou número seguro (o service trata Decimal)
+   * - date deve ser ISO (ex.: "2025-08-01T00:00:00.000Z")
+   */
   @Post()
   async create(@Body() dto: CreateTransactionDto) {
     return this.service.create(dto);

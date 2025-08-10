@@ -3,9 +3,10 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
 } from 'class-validator';
-import { TransactionType } from '@prisma/client';
+import { TransactionType, TransactionStatus } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 
 export class UpdateTransactionDto {
@@ -22,9 +23,16 @@ export class UpdateTransactionDto {
   @IsEnum(TransactionType)
   type: TransactionType;
 
+  @IsEnum(TransactionStatus)
+  status: TransactionStatus;
+
   @IsNumber()
   categoryId: number;
 
   @IsNumber()
   paymentMethodId: number;
+
+  @IsOptional()
+  @IsDateString()
+  updatedAt?: Date;
 }
