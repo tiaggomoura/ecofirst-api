@@ -8,6 +8,7 @@ import { toListItemDTO } from './mappers/transaction.mapper';
 import { TransactionRepository } from './repositories/transaction.repository';
 import { CreateTransactionUseCase } from './use-cases/create-transaction.usecase';
 import { FindTransactionsUseCase } from './use-cases/find-transactions.usecase';
+import { FindRecentActivityUseCase } from './use-cases/find-recent-activity.usecase';
 
 @Injectable()
 export class TransactionsService {
@@ -15,6 +16,7 @@ export class TransactionsService {
     private readonly repo: TransactionRepository,
     private readonly createUC: CreateTransactionUseCase,
     private readonly findUC: FindTransactionsUseCase,
+    private readonly findRecentActivityUC: FindRecentActivityUseCase,
   ) {}
 
   async create(dto: CreateTransactionDto) {
@@ -42,6 +44,25 @@ export class TransactionsService {
 
   async findPaginated(dto: FindTransactionsDto) {
     return this.findAllWithFilter(dto); // reaproveita o UC
+  }
+
+  async findRecentActivity(dto: FindTransactionsDto) {
+    const now = new Date();
+
+    const from = dto.from
+      ? new Date(dto.from)
+      : new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const to = dto.to
+      ? new Date(dto.to)
+      : new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    return this.findRecentActivityUC.execute(
+      from,
+      to,
+      dto.page || 1,
+      dto.limit || 10,
+    );
   }
 
   async findById(id: number) {

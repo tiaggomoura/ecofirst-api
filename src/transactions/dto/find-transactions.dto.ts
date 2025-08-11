@@ -33,6 +33,11 @@ export class FindTransactionsDto {
 
   @IsOptional()
   @IsInt()
+  @Min(1)
+  limit?: number;
+
+  @IsOptional()
+  @IsInt()
   installmentNumber?: number;
 
   @IsOptional()
