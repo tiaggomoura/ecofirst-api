@@ -104,4 +104,28 @@ export class TransactionRepository {
     }
     return where;
   }
+
+  // Marca como PAGO
+  async markAsPaid(id: number): Promise<void> {
+    await this.prisma.transaction.update({
+      where: { id },
+      data: { status: $Enums.TransactionStatus.PAGO },
+    });
+  }
+
+  // Marca como RECEBIDO
+  async markAsReceived(id: number): Promise<void> {
+    await this.prisma.transaction.update({
+      where: { id },
+      data: { status: $Enums.TransactionStatus.RECEBIDO },
+    });
+  }
+
+  // Marcar como cancelado
+  async markAsCanceled(id: number): Promise<void> {
+    await this.prisma.transaction.update({
+      where: { id },
+      data: { status: $Enums.TransactionStatus.CANCELADO },
+    });
+  }
 }

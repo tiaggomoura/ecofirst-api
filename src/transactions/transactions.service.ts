@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { $Enums, Prisma } from '@prisma/client';
 import { toMoney2 } from './domain/money';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { FindTransactionsDto } from './dto/find-transactions.dto';
@@ -98,5 +98,38 @@ export class TransactionsService {
 
   async delete(id: number) {
     await this.repo.delete(id);
+  }
+
+  /**
+   * Liquida a transação:
+   * - DESPESA (PENDENTE)  -> PAGO
+   * - RECEITA (PENDENTE)  -> RECEBIDO
+   * - Já PAGO/RECEBIDO    -> idempotente (true)
+   * Retorno:
+   * - false  -> não encontrada
+   * - true   -> sucesso (inclui idempotência)
+   */
+  async settle(id: number): Promise<boolean> {
+    const tx = await this.repo.findById(id);
+    if (!tx) return false;
+
+    // Idempotência: já liquidada
+    if (
+      tx.status === $Enums.TransactionStatus.PAGO ||
+      tx.status === $Enums.TransactionStatus.RECEBIDO
+    ) {
+      return true;
+    }
+
+    // Apenas quando PENDENTE escolhemos o novo status conforme o type
+    if (tx.status === $Enums.TransactionStatus.PENDENTE) {
+      if (tx.type === $Enums.TransactionType.DESPESA) {
+        await this.repo.markAsPaid(id); // DESPESA -> PAGO
+      } else {
+        await this.repo.markAsReceived(id); // RECEITA -> RECEBIDO
+      }
+      return true;
+    }
+    return true;
   }
 }

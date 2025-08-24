@@ -3,8 +3,11 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  NotFoundException,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Put,
   Query,
@@ -76,6 +79,13 @@ export class TransactionsController {
       ...result,
       amount: Number(result.amount.toFixed(2)),
     }));
+  }
+
+  @Patch(':id/settle')
+  @HttpCode(204)
+  async settle(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    const ok = await this.service.settle(id);
+    if (!ok) throw new NotFoundException('Transação não encontrada');
   }
 
   @Delete(':id')
