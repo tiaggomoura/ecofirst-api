@@ -9,9 +9,7 @@ async function bootstrap() {
     credentials: true, // se usar cookies/autenticação
   });
 
-  const port = process.env.PORT ? Number(process.env.PORT) : 3000;
-  await app.listen(port, '0.0.0.0'); // <-- escuta todas interfaces
-
-  //await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3000);
+  console.log(`Aplicação rodando na porta ${process.env.PORT ?? 3000}`);
 }
 bootstrap();
